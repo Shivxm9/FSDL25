@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Calculator with Toggleable History</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4; /* Neutral background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 300px; /* Adjust width to reduce empty space */
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .display {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            text-align: right;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background-color: #f4f6f9;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            box-shadow: inset 0 2px 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Ensures buttons are evenly spaced */
+            gap: 10px;
+            width: 100%; /* Ensures buttons fill the width of the calculator */
+        }
+
+        button {
+            padding: 20px;
+            font-size: 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #e4e9f1;
+            color: #333;
+            width: 100%; /* Ensures buttons fill their grid cell */
+        }
+
+        button:hover {
+            background-color: #f2f4fb;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Special color buttons */
+        .operator {
+            background-color: #7e8fe8;
+            color: #fff;
+        }
+
+        .operator:hover {
+            background-color: #6673c6;
+        }
+
+        .equal {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .equal:hover {
+            background-color: #45a049;
+        }
+
+        .clear {
+            background-color: #e57373;
+            color: white;
+        }
+
+        .clear:hover {
+            background-color: #d32f2f;
+        }
+
+        #history-toggle {
+            background-color: #3f88fc;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+
+        #history-toggle:hover {
+            background-color: #3366cc;
+        }
+
+        .history {
+            margin-top: 20px;
+            overflow-y: auto;
+            max-height: 180px;
+            transition: all 0.5s ease;
+            display: none;
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #history-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #history-list li {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        #history-list li:hover {
+            background-color: #e1e1e1;
+            transform: scale(1.05);
+        }
+
+        #history-list li:active {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <input type="text" id="display" disabled />
+        </div>
+        <div class="buttons">
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('/') "class="operator">/</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('*') "class="operator">*</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('-') "class="operator">-</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="calculate()" class="equal">=</button>
+            <button onclick="appendToDisplay('+')" class="operator">+</button>
+        </div>
+        <button onclick="toggleHistory()" id="history-toggle">Toggle History</button>
+        <div class="history" id="history">
+            <h3>History</h3>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = "";
+        let history = [];
+
+        // Function to clear the display
+        function clearDisplay() {
+            currentInput = "";
+            document.getElementById("display").value = "";
+        }
+
+        // Function to append values to the display
+        function appendToDisplay(value) {
+            currentInput += value;
+            document.getElementById("display").value = currentInput;
+        }
+
+        // Function to calculate the result
+        function calculate() {
+            try {
+                const result = eval(currentInput); 
+                if (result !== undefined && result !== null) {
+                    const historyItem = `${currentInput} = ${result}`;
+                    history.push(historyItem);
+                    updateHistory();
+                    currentInput = result.toString();
+                    document.getElementById("display").value = currentInput;
+                }
+            } catch (error) {
+                document.getElementById("display").value = "Error";
+                currentInput = "";
+            }
+        }
+
+        // Function to update the history list
+        function updateHistory() {
+            const historyList = document.getElementById("history-list");
+            historyList.innerHTML = "";
+            history.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                li.onclick = () => {
+                    currentInput = item.split('=')[0].trim();
+                    document.getElementById("display").value = currentInput;
+                };
+                historyList.appendChild(li);
+            });
+        }
+
+        // Function to toggle the visibility of the history
+        function toggleHistory() {
+            const historyDiv = document.getElementById("history");
+            if (historyDiv.style.display === "none" || historyDiv.style.display === "") {
+                historyDiv.style.display = "block";
+            } else {
+                historyDiv.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

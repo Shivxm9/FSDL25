@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polling System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .polling-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        input[type="radio"] {
+            margin: 10px;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .poll-bar {
+            width: 0;
+            height: 30px;
+            background-color: #f4a261;
+            margin: 5px 0;
+            border-radius: 5px;
+            position: relative;
+            transition: width 2s ease;
+        }
+
+        .bar-label {
+            position: absolute;
+            left: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        #html-bar {
+            background-color: #2d6a4f;
+        }
+
+        #css-bar {
+            background-color: #e9c46a;
+        }
+
+        #javascript-bar {
+            background-color: #264653;
+        }
+    </style>
+</head>
+<body>
+    <div class="polling-container">
+        <h2>What's your favorite programming language?</h2>
+        <form id="poll-form">
+            <input type="radio" id="html" name="language" value="HTML">
+            <label for="html">HTML</label><br>
+            <input type="radio" id="css" name="language" value="CSS">
+            <label for="css">CSS</label><br>
+            <input type="radio" id="javascript" name="language" value="JavaScript">
+            <label for="javascript">JavaScript</label><br>
+            <button type="submit">Vote</button>
+        </form>
+
+        <h3>Poll Results:</h3>
+        <div id="result" class="result-container">
+            <div class="poll-bar" id="html-bar"><span class="bar-label">HTML</span></div>
+            <div class="poll-bar" id="css-bar"><span class="bar-label">CSS</span></div>
+            <div class="poll-bar" id="javascript-bar"><span class="bar-label">JavaScript</span></div>
+        </div>
+    </div>
+
+    <script>
+        const pollResults = {
+            HTML: 0,
+            CSS: 0,
+            JavaScript: 0
+        };
+
+        document.getElementById('poll-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the selected value
+            const selectedLanguage = document.querySelector('input[name="language"]:checked');
+            
+            if (!selectedLanguage) {
+                alert("Please select an option before submitting your vote.");
+                return;
+            }
+
+            // Update poll results
+            pollResults[selectedLanguage.value]++;
+
+            // Hide the poll form and show the results
+            document.getElementById('poll-form').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+
+            // Calculate the total votes
+            const totalVotes = pollResults.HTML + pollResults.CSS + pollResults.JavaScript;
+
+            // Calculate the percentage for each option
+            const htmlPercentage = (pollResults.HTML / totalVotes) * 100;
+            const cssPercentage = (pollResults.CSS / totalVotes) * 100;
+            const javascriptPercentage = (pollResults.JavaScript / totalVotes) * 100;
+
+            // Animate the progress bars
+            setTimeout(() => {
+                document.getElementById('html-bar').style.width = `${htmlPercentage}%`;
+                document.getElementById('css-bar').style.width = `${cssPercentage}%`;
+                document.getElementById('javascript-bar').style.width = `${javascriptPercentage}%`;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
