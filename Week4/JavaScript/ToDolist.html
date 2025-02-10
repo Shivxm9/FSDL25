@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative To-Do List</title>
+    <style>
+        /* Basic page styling */
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for the to-do list */
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            border: 2px solid #ffb3b3;
+            background-color: #fdf1f1;
+        }
+
+        /* Title styling */
+        h1 {
+            color: #ff4d4d;
+            font-size: 2em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Input box and button styles */
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 2px solid #ffb3b3;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff6666;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffb3b3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff6666;
+            transform: scale(1.05);
+        }
+
+        /* List styles */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #ffe6e6;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            opacity: 0; /* Initially hidden for animation */
+            animation: fadeInEvent 0.8s ease-out forwards;
+        }
+
+        /* Event text */
+        .event-text {
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Container for buttons */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 12px; /* Equal spacing between buttons */
+        }
+
+        .edit-btn, .delete-btn, .complete-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            width: 30%; /* Equal width for all buttons */
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        /* Edit button styling */
+        .edit-btn {
+            background-color: #80b3ff;
+        }
+
+        .edit-btn:hover {
+            background-color: #3399ff;
+            transform: scale(1.1);
+        }
+
+        /* Delete button styling */
+        .delete-btn {
+            background-color: #ff6666;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff3333;
+            transform: scale(1.1);
+        }
+
+        /* Complete button styling */
+        .complete-btn {
+            background-color: #66cc66;
+        }
+
+        .complete-btn:hover {
+            background-color: #4caf50;
+            transform: scale(1.1);
+        }
+
+        /* Strikethrough styling with animation */
+        .completed {
+            text-decoration: line-through;
+            color: #999999;
+            transition: text-decoration 0.3s ease, color 0.3s ease;
+        }
+
+        /* Fade-in animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInEvent {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>To-Do List</h1>
+    <input type="text" id="event-input" placeholder="Add a new event..." onkeydown="checkEnter(event)" />
+    <button onclick="addEvent()">Add Event</button>
+
+    <ul id="event-list"></ul>
+</div>
+
+<script>
+    // Function to add a new event
+    function addEvent() {
+        const eventInput = document.getElementById('event-input');
+        const eventText = eventInput.value.trim();
+
+        if (eventText === '') {
+            alert('Please enter an event!');
+            return;
+        }
+
+        // Create a new list item for the event
+        const li = document.createElement('li');
+        
+        // Create the event text element
+        const eventTextElement = document.createElement('div');
+        eventTextElement.classList.add('event-text');
+        eventTextElement.textContent = eventText;
+
+        // Create a container for the buttons
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        // Create an Edit button for each event
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.classList.add('edit-btn');
+        editBtn.onclick = function() {
+            // Edit the event text
+            const newEventText = prompt('Edit your event:', eventTextElement.textContent);
+            if (newEventText !== null && newEventText.trim() !== '') {
+                eventTextElement.textContent = newEventText;
+            }
+        };
+
+        // Create a Delete button for each event
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.onclick = function() {
+            li.remove();  // Remove the event when clicked
+        };
+
+        // Create a Complete button for each event
+        const completeBtn = document.createElement('button');
+        completeBtn.textContent = 'Complete';
+        completeBtn.classList.add('complete-btn');
+        completeBtn.onclick = function() {
+            li.classList.toggle('completed');  // Toggle the strikethrough effect
+            if (li.classList.contains('completed')) {
+                completeBtn.textContent = 'Undo';  // Change button text to "Undo" after completing
+            } else {
+                completeBtn.textContent = 'Complete';  // Change button text back to "Complete"
+            }
+        };
+
+        // Add buttons to the button container
+        buttonContainer.appendChild(editBtn);
+        buttonContainer.appendChild(deleteBtn);
+        buttonContainer.appendChild(completeBtn);
+
+        // Append event text and button container to the list item
+        li.appendChild(eventTextElement);
+        li.appendChild(buttonContainer);
+
+        // Append the list item to the event list
+        document.getElementById('event-list').appendChild(li);
+
+        // Clear the input field
+        eventInput.value = '';
+    }
+
+    // Function to check for Enter key press
+    function checkEnter(event) {
+        if (event.key === "Enter") {
+            addEvent();  // Trigger the addEvent function when Enter is pressed
+        }
+    }
+</script>
+
+</body>
+</html>
