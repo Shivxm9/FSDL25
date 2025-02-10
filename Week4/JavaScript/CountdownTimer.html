@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        /* Basic page styling */
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for the timer */
+        .timer-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            border: 2px solid #66cc66;
+            background-color: #f9f9f9;
+        }
+
+        /* Digital Timer Display */
+        #timer {
+            font-size: 3em;
+            color: #ff6666;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Analog Timer Styling */
+        .analog-timer {
+            width: 150px;
+            height: 150px;
+            border: 10px solid #66cc66;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Common styling for clock hands */
+        .analog-timer .hour, .analog-timer .minute, .analog-timer .second {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 50%;
+            height: 3px;
+            background-color: #66cc66;
+            transform-origin: 100%;
+            transform: translateX(-50%);
+            transition: all 0.5s ease;
+            border-radius: 4px;
+            z-index: 2;
+        }
+
+        /* Minute hand */
+        .analog-timer .minute {
+            background-color: #ffcc00;
+            height: 5px;
+        }
+
+        /* Second hand */
+        .analog-timer .second {
+            background-color: #ff6666;
+            height: 2px;
+        }
+
+        /* Button styling */
+        button {
+            width: 48%;
+            padding: 10px;
+            background-color: #66cc66;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #4caf50;
+            transform: scale(1.05);
+        }
+
+        /* Styling for adjusting time buttons */
+        .adjust-time {
+            display: inline-flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .adjust-time button {
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            padding: 0;
+            background-color: #ffcc00;
+        }
+
+        /* Reset Button Placement */
+        #resetBtn {
+            margin-top: 30px;
+            width: 100%;
+            background-color: #ff6347;
+        }
+
+        /* Keyframe for fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="timer-container">
+    <div id="timer-container">
+        <div id="timer">00:00</div>
+        <div class="analog-timer" id="analog-timer" style="display: none;">
+            <div class="hour" id="hour"></div>
+            <div class="minute" id="minute"></div>
+            <div class="second" id="second"></div>
+        </div>
+    </div>
+    
+    <button id="startStopBtn" onclick="startStopTimer()">Start</button>
+    <div class="adjust-time">
+        <span>Minutes</span>
+        <button onclick="changeTime('minutes', -1)">-</button>
+        <button onclick="changeTime('minutes', 1)">+</button>
+    </div>
+    <div class="adjust-time">
+        <span>Seconds</span>
+        <button onclick="changeTime('seconds', -1)">-</button>
+        <button onclick="changeTime('seconds', 1)">+</button>
+    </div>
+    <button id="resetBtn" onclick="resetTimer()">Reset</button>
+    <button onclick="toggleTimerType()">Switch to Analog/Digital</button>
+</div>
+
+<script>
+    let timer;
+    let isRunning = false;
+    let seconds = 0;
+    let minutes = 0;
+    let isAnalog = false;
+
+    // Function to start or stop the timer
+    function startStopTimer() {
+        if (isRunning) {
+            clearInterval(timer);
+            document.getElementById("startStopBtn").textContent = "Start";
+        } else {
+            timer = setInterval(updateTime, 1000);
+            document.getElementById("startStopBtn").textContent = "Stop";
+        }
+        isRunning = !isRunning;
+    }
+
+    // Function to update the countdown
+    function updateTime() {
+        if (seconds === 0 && minutes === 0) {
+            clearInterval(timer);
+            alert("Time's up!");
+            document.getElementById("startStopBtn").textContent = "Start";
+            isRunning = false;
+            return;
+        }
+
+        if (seconds === 0) {
+            if (minutes > 0) {
+                minutes--;
+                seconds = 59;
+            }
+        } else {
+            seconds--;
+        }
+
+        if (isAnalog) {
+            updateAnalogTime();
+        } else {
+            displayTime();
+        }
+    }
+
+    // Function to display the time in digital format
+    function displayTime() {
+        let minutesDisplay = minutes < 10 ? '0' + minutes : minutes;
+        let secondsDisplay = seconds < 10 ? '0' + seconds : seconds;
+        document.getElementById("timer").textContent = minutesDisplay + ":" + secondsDisplay;
+    }
+
+    // Function to update the analog timer
+    function updateAnalogTime() {
+        let minuteDeg = (minutes % 60) * 6; // 360 degrees / 60 minutes
+        let secondDeg = (seconds % 60) * 6; // 360 degrees / 60 seconds
+
+        document.getElementById("minute").style.transform = `rotate(${minuteDeg}deg)`;
+        document.getElementById("second").style.transform = `rotate(${secondDeg}deg)`;
+    }
+
+    // Function to reset the timer
+    function resetTimer() {
+        clearInterval(timer);
+        minutes = 0;
+        seconds = 0;
+        if (isAnalog) {
+            updateAnalogTime();
+        } else {
+            displayTime();
+        }
+        document.getElementById("startStopBtn").textContent = "Start";
+        isRunning = false;
+    }
+
+    // Function to change the timer (increase/decrease)
+    function changeTime(unit, value) {
+        if (unit === 'minutes') {
+            minutes += value;
+            if (minutes < 0) minutes = 0; // Prevent negative time
+        } else if (unit === 'seconds') {
+            seconds += value;
+            if (seconds >= 60) {
+                minutes += Math.floor(seconds / 60);
+                seconds = seconds % 60;
+            }
+            if (seconds < 0) seconds = 0; // Prevent negative seconds
+        }
+        if (isAnalog) {
+            updateAnalogTime();
+        } else {
+            displayTime();
+        }
+    }
+
+    // Function to toggle between digital and analog timer
+    function toggleTimerType() {
+        isAnalog = !isAnalog;
+        document.getElementById("timer").style.display = isAnalog ? "none" : "block";
+        document.getElementById("analog-timer").style.display = isAnalog ? "block" : "none";
+        if (isAnalog) {
+            updateAnalogTime();
+        } else {
+            displayTime();
+        }
+    }
+
+    // Initial display
+    displayTime();
+
+</script>
+
+</body>
+</html>
