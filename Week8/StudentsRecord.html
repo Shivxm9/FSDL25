@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="studentApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Records</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .error { color: red; }
+        .valid { color: green; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body ng-controller="StudentController">
+
+    <h2>Student Records</h2>
+
+    <!-- Student Form -->
+    <form name="studentForm" ng-submit="addStudent()" novalidate>
+
+        <label>Name:</label>
+        <input type="text" name="name" ng-model="student.name" ng-change="checkName()" required minlength="3">
+        <span class="error" ng-show="studentForm.name.$touched && studentForm.name.$invalid">
+            Name is required (min 3 characters).
+        </span>
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" ng-model="student.email" required>
+        <span class="error" ng-show="studentForm.email.$touched && studentForm.email.$invalid">
+            Enter a valid email.
+        </span>
+        <br><br>
+
+        <label>Age:</label>
+        <input type="number" name="age" ng-model="student.age" required min="18" max="100">
+        <span class="error" ng-show="studentForm.age.$touched && studentForm.age.$invalid">
+            Age must be between 18 and 100.
+        </span>
+        <br><br>
+
+        <button type="submit" ng-disabled="studentForm.$invalid">Add Student</button>
+        <p class="valid" ng-show="studentForm.$valid">Form is valid.</p>
+        <p class="error" ng-show="studentForm.$invalid">Form is invalid.</p>
+
+    </form>
+
+    <hr>
+
+    <!-- Student List -->
+    <h3>Student List</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Action</th>
+        </tr>
+        <tr ng-repeat="s in students">
+            <td>{{ s.name }}</td>
+            <td>{{ s.email }}</td>
+            <td>{{ s.age }}</td>
+            <td><button ng-click="deleteStudent($index)">Delete</button></td>
+        </tr>
+    </table>
+
+    <script>
+        var app = angular.module('studentApp', []);
+
+        app.controller('StudentController', function($scope) {
+            // Array to store student records
+            $scope.students = [];
+
+            // Student object
+            $scope.student = {};
+
+            // Function to check name change
+            $scope.checkName = function() {
+                console.log("Name changed:", $scope.student.name);
+            };
+
+            // Function to add student
+            $scope.addStudent = function() {
+                if ($scope.studentForm.$valid) {
+                    $scope.students.push(angular.copy($scope.student)); // Add student
+                    console.log("Student added:", $scope.student);
+                    $scope.student = {}; // Reset form
+                    $scope.studentForm.$setPristine(); // Reset validation
+                    $scope.studentForm.$setUntouched();
+                }
+            };
+
+            // Function to delete student
+            $scope.deleteStudent = function(index) {
+                $scope.students.splice(index, 1);
+                console.log("Student deleted at index:", index);
+            };
+        });
+    </script>
+
+</body>
+</html>
